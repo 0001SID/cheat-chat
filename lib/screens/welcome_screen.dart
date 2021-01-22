@@ -1,3 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flash_chat/screens/chat_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'login_screen.dart';
@@ -14,10 +16,20 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     with SingleTickerProviderStateMixin {
   AnimationController _controller;
   Animation _animation;
+  FirebaseAuth _auth = FirebaseAuth.instance;
+  FirebaseUser _user;
+
+  void getCurrentUser() async {
+    _user = await _auth.currentUser();
+    if (_user != null) {
+      Navigator.pushNamed(context, ChatScreen.route);
+    }
+  }
 
   @override
   void initState() {
     super.initState();
+    getCurrentUser();
     _controller = AnimationController(
       duration: Duration(seconds: 1),
       vsync: this,

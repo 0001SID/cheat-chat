@@ -12,7 +12,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  String email, password;
+  String email, password, emailErrorText, passErrorText;
   FirebaseAuth _auth;
   bool _isLoading = false;
 
@@ -55,8 +55,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 onChanged: (value) {
                   email = value;
                 },
-                decoration:
-                    kAuthFieldDecoration.copyWith(hintText: 'Enter your email'),
+                decoration: kAuthFieldDecoration.copyWith(
+                    hintText: 'Enter your email', errorText: emailErrorText),
               ),
               SizedBox(
                 height: 8.0,
@@ -71,7 +71,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     password = value;
                   },
                   decoration: kAuthFieldDecoration.copyWith(
-                      hintText: 'Enter your password')),
+                    hintText: 'Enter your password',
+                    errorText: passErrorText,
+                  )),
               SizedBox(
                 height: 24.0,
               ),
@@ -93,6 +95,34 @@ class _LoginScreenState extends State<LoginScreen> {
                     });
                   } catch (e) {
                     print('Error in login page $e');
+                    bool isEmailError = false;
+                    if (e.code == 'ERROR_INVALID_EMAIL') {
+                      setState(() {
+                        isEmailError = true;
+                        emailErrorText = 'Invalid Email';
+                      });
+                    }
+                    if (e.code == 'ERROR_WRONG_PASSWORD') {
+                      setState(() {
+                        passErrorText = 'Wrong Password';
+                      });
+                    } else {
+                      setState(() {
+                        passErrorText = null;
+                      });
+                    }
+                    if (e.code == 'ERROR_USER_NOT_FOUND') {
+                      setState(() {
+                        isEmailError = true;
+                        emailErrorText = 'User Not Found';
+                      });
+                    }
+
+                    if (!isEmailError) {
+                      setState(() {
+                        emailErrorText = null;
+                      });
+                    }
                     setState(() {
                       _isLoading = false;
                     });

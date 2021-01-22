@@ -13,7 +13,7 @@ class RegistrationScreen extends StatefulWidget {
 }
 
 class _RegistrationScreenState extends State<RegistrationScreen> {
-  String email, password;
+  String email, password, emailErrorText, passErrorText;
   bool _isLoading = false;
   FirebaseAuth _auth;
 
@@ -56,8 +56,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 onChanged: (value) {
                   email = value;
                 },
-                decoration:
-                    kAuthFieldDecoration.copyWith(hintText: 'Enter your email'),
+                decoration: kAuthFieldDecoration.copyWith(
+                    hintText: 'Enter your email', errorText: emailErrorText),
               ),
               SizedBox(
                 height: 8.0,
@@ -72,7 +72,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   password = value;
                 },
                 decoration: kAuthFieldDecoration.copyWith(
-                    hintText: 'Enter your password'),
+                    hintText: 'Enter your password', errorText: passErrorText),
               ),
               SizedBox(
                 height: 24.0,
@@ -95,6 +95,41 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     });
                   } catch (e) {
                     print('Error in register page $e');
+                    bool isEmailError = false;
+                    if (e.code == 'ERROR_INVALID_EMAIL') {
+                      setState(() {
+                        isEmailError = true;
+                        emailErrorText = 'Invalid Email';
+                      });
+                    }
+                    if (e.code == 'ERROR_USER_NOT_FOUND') {
+                      setState(() {
+                        isEmailError = true;
+                        emailErrorText = 'User Not Found';
+                      });
+                    }
+                    if (e.code == 'ERROR_EMAIL_ALREADY_IN_USE') {
+                      setState(() {
+                        isEmailError = true;
+                        emailErrorText = 'Email already exists';
+                      });
+                    }
+                    if (e.code == 'ERROR_WEAK_PASSWORD') {
+                      setState(() {
+                        passErrorText =
+                            'Password is too weak. Six Character must.';
+                      });
+                    } else {
+                      setState(() {
+                        passErrorText = null;
+                      });
+                    }
+
+                    if (!isEmailError) {
+                      setState(() {
+                        emailErrorText = null;
+                      });
+                    }
                     setState(() {
                       _isLoading = false;
                     });
